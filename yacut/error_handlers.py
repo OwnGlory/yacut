@@ -1,30 +1,33 @@
-from flask import jsonify, render_template
+from flask import jsonify, render_template, request
 
 from . import app, db
 
 
 class InvalidAPIRequest(Exception):
 
-    status_code = 400
-
-    def __init__(self, message, status_code=None):
+    def __init__(self, message, status_code=400):
         super().__init__()
         self.message = message
         if status_code:
             self.status_code = status_code
 
     def to_dict(self):
-        return dict(message=self.message)
+        return {'message': self.message}
 
 
 @app.errorhandler(InvalidAPIRequest)
 def invalid_api_request(error):
-    return jsonify(error.to_dict(), error.status_code)
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
 
 
 @app.errorhandler(404)
 def page_not_found(error):
-    return render_template('404.html'), 404
+    if request.path.startswith('/api/'):
+        return jsonify({'message': 'Указанный id не найден'}), 404
+    else:
+        return render_template('404.html'), 404
 
 
 @app.errorhandler(500)

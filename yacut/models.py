@@ -11,11 +11,15 @@ class URLMap(db.Model):
 
     def to_dict(self):
         return dict(
-            original=self.original,
-            short=self.short
+            url=self.original,
+            custom_id=self.short
         )
 
     def from_dict(self, data):
-        for field in ['original', 'short']:
+        field_map = {
+            'url': 'original',
+            'custom_id': 'short'
+        }
+        for field in field_map:
             if field in data:
-                setattr(self, field, data[field])
+                setattr(self, field_map[field], data[field])
