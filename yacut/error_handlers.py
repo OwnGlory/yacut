@@ -26,8 +26,7 @@ def invalid_api_request(error):
 def page_not_found(error):
     if request.path.startswith('/api/'):
         return jsonify({'message': 'Указанный id не найден'}), 404
-    else:
-        return render_template('404.html'), 404
+    return render_template('404.html'), 404
 
 
 @app.errorhandler(500)

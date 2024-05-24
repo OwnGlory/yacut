@@ -1,11 +1,11 @@
 import random
 import string
+
 from flask import flash, render_template, redirect, url_for
 
 from . import app, db
 from .forms import URLForm
 from .models import URLMap
-from .error_handlers import InvalidAPIRequest
 
 
 @app.route('/', methods=('GET', 'POST'))
@@ -38,8 +38,6 @@ def index_view():
                 new_link
             ), 'safe'
         )
-    else:
-        print(form.errors)
     return render_template('main.html', form=form)
 
 
@@ -55,7 +53,5 @@ def get_unique_short_id(length=6):
 
 @app.route('/<string:short_id>')
 def redirect_to_url(short_id):
-    urlmap = URLMap.query.filter_by(short=short_id).first()
-    if urlmap is None:
-        raise InvalidAPIRequest('Указанный id не найден', 404)
+    urlmap = URLMap.query.filter_by(short=short_id).first_or_404()
     return redirect(urlmap.original)
